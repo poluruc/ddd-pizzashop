@@ -4,7 +4,6 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrder;
 import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
 import lombok.Builder;
 import lombok.NonNull;
@@ -57,7 +56,7 @@ public final class KitchenOrder implements Aggregate {
         this.state = State.PREPPING;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new KitchenOrderPrepStartedEvent(ref));
+        $eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderPrepStartedEvent(ref));
     }
 
     boolean isPrepping() {
@@ -72,7 +71,7 @@ public final class KitchenOrder implements Aggregate {
         this.state = State.BAKING;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new KitchenOrderPrepStartedEvent(ref));
+        $eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderBakeStartedEvent(ref));
     }
 
     boolean isBaking() {
@@ -87,7 +86,7 @@ public final class KitchenOrder implements Aggregate {
         this.state = State.ASSEMBLING;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new KitchenOrderBakeStartedEvent(ref));
+        $eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderAssemblyStartedEvent(ref));
     }
 
     boolean hasStartedAssembly() {
@@ -102,7 +101,7 @@ public final class KitchenOrder implements Aggregate {
         this.state = State.ASSEMBLED;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new KitchenOrderAssemblyStartedEvent(ref));
+        $eventLog.publish(new Topic("kitchen_orders"), new KitchenOrderAssemblyFinishedEvent(ref));
     }
 
     boolean hasFinishedAssembly() {

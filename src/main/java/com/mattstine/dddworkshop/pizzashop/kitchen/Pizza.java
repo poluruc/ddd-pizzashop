@@ -5,12 +5,6 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.AggregateState;
-import com.mattstine.dddworkshop.pizzashop.kitchen.KitchenOrder.OrderState;
-import com.mattstine.dddworkshop.pizzashop.kitchen.Pizza.Size;
-import com.mattstine.dddworkshop.pizzashop.kitchen.Pizza.State;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrder;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderPaidEvent;
-import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
 
 import lombok.Builder;
 import lombok.NonNull;
@@ -65,7 +59,7 @@ public final class Pizza implements Aggregate {
         this.state = State.PREPPING;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new PizzaPrepStartedEvent(ref));
+        $eventLog.publish(new Topic("pizzas"), new PizzaPrepStartedEvent(ref));
     }
 
     boolean isPrepping() {
@@ -81,7 +75,7 @@ public final class Pizza implements Aggregate {
         this.state = State.PREPPED;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new PizzaPrepFinishedEvent(ref));
+        $eventLog.publish(new Topic("pizzas"), new PizzaPrepFinishedEvent(ref));
     }
 
     boolean hasFinishedPrep() {
@@ -97,7 +91,7 @@ public final class Pizza implements Aggregate {
         this.state = State.BAKING;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new PizzaPrepFinishedEvent(ref));
+        $eventLog.publish(new Topic("pizzas"), new PizzaBakeStartedEvent(ref));
     }
 
     boolean isBaking() {
@@ -113,7 +107,7 @@ public final class Pizza implements Aggregate {
         this.state = State.BAKED;
 
         assert $eventLog != null;
-        $eventLog.publish(new Topic("kitchen"), new PizzaBakeFinishedEvent(ref));
+        $eventLog.publish(new Topic("pizzas"), new PizzaBakeFinishedEvent(ref));
     }
 
     boolean hasFinishedBaking() {
