@@ -38,6 +38,7 @@ public class InProcessEventSourcedPizzaRepositoryTests {
     @Test
     @Tag("Lab3Tests")
     public void should_provide_the_next_available_identity() {
+        System.out.println("ref.getRefere:"+ ref.getReference());
         assertThat(ref.getReference()).isNotNull();
     }
 
