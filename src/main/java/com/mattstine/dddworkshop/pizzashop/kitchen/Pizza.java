@@ -119,7 +119,8 @@ public final class Pizza implements Aggregate {
         return Pizza.builder()
                 .eventLog(EventLog.IDENTITY)
                 .ref(PizzaRef.IDENTITY)
-                // .state(State.NEW)
+                .kitchenOrderRef(KitchenOrderRef.IDENTITY)
+                .size(Size.IDENTITY)
                 .build();
     }
 
