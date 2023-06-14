@@ -1,5 +1,6 @@
 package com.mattstine.dddworkshop.pizzashop.kitchen;
 
+import com.mattstine.dddworkshop.pizzashop.infrastructure.events.adapters.InProcessEventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.ports.Aggregate;
@@ -113,6 +114,7 @@ public final class KitchenOrder implements Aggregate {
         return KitchenOrder.builder()
                 .eventLog(EventLog.IDENTITY)
                 .ref(KitchenOrderRef.IDENTITY)
+                .onlineOrderRef(OnlineOrderRef.IDENTITY)
                 // .state(State.NEW)
                 .build();
     }
@@ -135,13 +137,61 @@ public final class KitchenOrder implements Aggregate {
         ASSEMBLED
     }
 
-    private static class Accumulator implements BiFunction<KitchenOrder, KitchenOrderEvent, KitchenOrder> {
+  private static class Accumulator implements BiFunction<KitchenOrder, KitchenOrderEvent, KitchenOrder> {
 
         @Override
         public KitchenOrder apply(KitchenOrder kitchenOrder, KitchenOrderEvent kitchenOrderEvent) {
-            return null;
-        }
+            // implement accumulator function here
+            if (kitchenOrderEvent instanceof KitchenOrderAddedEvent) {
+                KitchenOrderAddedEvent e = (KitchenOrderAddedEvent) kitchenOrderEvent;
+                return KitchenOrder.builder()
+                        .ref(e.getRef())
+                        .onlineOrderRef(e.getState().getOnlineOrderRef())
+                        .pizzas(e.getState().getPizzas())
+                        .eventLog(InProcessEventLog.instance())
+                        .build();
+            } else if (kitchenOrderEvent instanceof KitchenOrderPrepStartedEvent) {
+                KitchenOrderPrepStartedEvent e = (KitchenOrderPrepStartedEvent) kitchenOrderEvent;
+                KitchenOrder k = KitchenOrder.builder()
+                        .ref(kitchenOrder.ref)
+                        .onlineOrderRef(kitchenOrder.onlineOrderRef)
+                        .pizzas(kitchenOrder.pizzas)
+                        .eventLog(kitchenOrder.$eventLog)
+                        .build();
+                        k.state= State.PREPPING;
+                        return k;
+            } else if(kitchenOrderEvent instanceof KitchenOrderBakeStartedEvent) {
+                KitchenOrder k = KitchenOrder.builder()
+                        .ref(kitchenOrder.ref)
+                        .onlineOrderRef(kitchenOrder.onlineOrderRef)
+                        .pizzas(kitchenOrder.pizzas)
+                        .eventLog(kitchenOrder.$eventLog)
+                        .build();
+                        k.state= State.BAKING;
+                        return k;
+            } else if(kitchenOrderEvent instanceof KitchenOrderAssemblyStartedEvent) {
+                KitchenOrder k = KitchenOrder.builder()
+                        .ref(kitchenOrder.ref)
+                        .onlineOrderRef(kitchenOrder.onlineOrderRef)
+                        .pizzas(kitchenOrder.pizzas)
+                        .eventLog(kitchenOrder.$eventLog)
+                        .build();
+                        k.state= State.ASSEMBLING;
+                        return k;
+            } else if(kitchenOrderEvent instanceof KitchenOrderAssemblyFinishedEvent) {
+                KitchenOrder k = KitchenOrder.builder()
+                        .ref(kitchenOrder.ref)
+                        .onlineOrderRef(kitchenOrder.onlineOrderRef)
+                        .pizzas(kitchenOrder.pizzas)
+                        .eventLog(kitchenOrder.$eventLog)
+                        .build();
+                        k.state= State.ASSEMBLED;
+                        return k;
+            } else {
+                throw new IllegalStateException("Unknown event type: " + kitchenOrderEvent.getClass().getSimpleName());
+            }
 
+    }
     }
 
     /*

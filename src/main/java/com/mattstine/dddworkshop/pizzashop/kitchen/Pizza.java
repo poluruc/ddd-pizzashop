@@ -162,10 +162,50 @@ public final class Pizza implements Aggregate {
                         .ref(pizzaState.getRef())
                         .kitchenOrderRef(pizzaState.getKitchenOrderRef())
                         .size(pizzaState.getSize())
-                        // .state(pizzaState.getState())
                         .build();
+            } else if (pizzaEvent instanceof PizzaPrepStartedEvent) {
+                PizzaPrepStartedEvent psse = (PizzaPrepStartedEvent) pizzaEvent;
+                Pizza p = Pizza.builder()
+                        .eventLog(InProcessEventLog.instance())
+                        .ref(pizza.getRef())
+                        .kitchenOrderRef(pizza.getKitchenOrderRef())
+                        .size(pizza.getSize())
+                        .build();
+                p.state = State.PREPPING;
+                return p;
+            } else if (pizzaEvent instanceof PizzaPrepFinishedEvent) {
+                PizzaPrepFinishedEvent psfe = (PizzaPrepFinishedEvent) pizzaEvent;
+                Pizza p= Pizza.builder()
+                        .eventLog(InProcessEventLog.instance())
+                        .ref(pizza.getRef())
+                        .kitchenOrderRef(pizza.getKitchenOrderRef())
+                        .size(pizza.getSize())
+                        .build();
+                p.state = State.PREPPED;
+                return p;
+            } else if (pizzaEvent instanceof PizzaBakeStartedEvent) {
+                PizzaBakeStartedEvent pbse = (PizzaBakeStartedEvent) pizzaEvent;
+                Pizza p= Pizza.builder()
+                        .eventLog(InProcessEventLog.instance())
+                        .ref(pizza.getRef())
+                        .kitchenOrderRef(pizza.getKitchenOrderRef())
+                        .size(pizza.getSize())
+                        .build();
+                p.state = State.BAKING;
+                return p;
+            } else if (pizzaEvent instanceof PizzaBakeFinishedEvent) {
+                PizzaBakeFinishedEvent pbfe = (PizzaBakeFinishedEvent) pizzaEvent;
+                Pizza p= Pizza.builder()
+                        .eventLog(InProcessEventLog.instance())
+                        .ref(pizza.getRef())
+                        .kitchenOrderRef(pizza.getKitchenOrderRef())
+                        .size(pizza.getSize())
+                        .build();
+                p.state = State.BAKED;
+                return p;
+            } else {
+                throw new IllegalStateException("Unknown PizzaEvent");
             }
-            throw new IllegalStateException("Unknown PizzaEvent");
         }        
     }
 
