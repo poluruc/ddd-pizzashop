@@ -4,14 +4,12 @@ import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.EventLog;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.events.ports.Topic;
 import com.mattstine.dddworkshop.pizzashop.infrastructure.repository.adapters.InProcessEventSourcedRepository;
 import com.mattstine.dddworkshop.pizzashop.ordering.OnlineOrderRef;
-import com.mattstine.dddworkshop.pizzashop.payments.PaymentRef;
 
-import java.util.HashMap;
 import java.util.Map;
 
 final class InProcessEventSourcedKitchenOrderRepository extends InProcessEventSourcedRepository<KitchenOrderRef, KitchenOrder, KitchenOrder.OrderState, KitchenOrderEvent, KitchenOrderAddedEvent> implements KitchenOrderRepository {
 
-    private Map<OnlineOrderRef, KitchenOrder> onlineOrderToKitchenOrderRef;
+    private Map<OnlineOrderRef, KitchenOrderRef> onlineOrderToKitchenOrderRef = new java.util.concurrent.ConcurrentHashMap<>();
 
     InProcessEventSourcedKitchenOrderRepository(EventLog eventLog, Topic topic) {
         super(eventLog,
@@ -22,10 +20,17 @@ final class InProcessEventSourcedKitchenOrderRepository extends InProcessEventSo
                 topic);
 
         // onlineOrderToKitchenOrderRef.putIfAbsent(eventLog.)
+        eventLog.subscribe(topic, e -> {
+            if (e instanceof KitchenOrderAddedEvent) {
+                KitchenOrderAddedEvent koae = (KitchenOrderAddedEvent) e;
+                onlineOrderToKitchenOrderRef.putIfAbsent(koae.getState().getOnlineOrderRef(), koae.getRef());
+            }
+        });
     }
 
     @Override
     public KitchenOrder findByOnlineOrderRef(OnlineOrderRef onlineOrderRef) {
-        return null;
+        KitchenOrderRef kitchenOrderRef = onlineOrderToKitchenOrderRef.get(onlineOrderRef);
+        return findByRef(kitchenOrderRef);
     }
 }
