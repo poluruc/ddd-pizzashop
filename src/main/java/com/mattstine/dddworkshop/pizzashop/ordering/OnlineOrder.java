@@ -34,7 +34,11 @@ public final class OnlineOrder implements Aggregate {
     PaymentRef paymentRef;
 
     @Builder
-    private OnlineOrder(@NonNull Type type, @NonNull EventLog eventLog, @NonNull OnlineOrderRef ref) {
+    private OnlineOrder(
+            @NonNull Type type,
+            @NonNull EventLog eventLog,
+            @NonNull OnlineOrderRef ref
+        ) {
         this.type = type;
         this.$eventLog = eventLog;
         this.ref = ref;
